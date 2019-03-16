@@ -11,9 +11,7 @@
 const char* ssid     = "my_wifi_ssid";
 const char* password = "my_wifi_password";
 
-const char* host = "data.sparkfun.com";
-const char* streamId   = "....................";
-const char* privateKey = "....................";
+const char* host = "0.0.0.0";
 
 void setup()
 {
@@ -52,19 +50,14 @@ void loop()
 
     // Use WiFiClient class to create TCP connections
     WiFiClient client;
-    const int httpPort = 80;
+    const int httpPort = 9090;
     if (!client.connect(host, httpPort)) {
         Serial.println("connection failed");
         return;
     }
 
     // We now create a URI for the request
-    String url = "/input/";
-    url += streamId;
-    url += "?private_key=";
-    url += privateKey;
-    url += "&value=";
-    url += value;
+    String url = "/ola.html";
 
     Serial.print("Requesting URL: ");
     Serial.println(url);
