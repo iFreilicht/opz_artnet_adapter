@@ -21,7 +21,7 @@ const char* host = "0.0.0.0";
 
 // DMX settings
 const int num_channels_per_fixture = 3;
-const int num_fixtures = 16;
+const int num_fixtures = 1;
 const int num_channels = num_fixtures * num_channels_per_fixture;
 const int baud_rate = 115200;
 
@@ -36,6 +36,7 @@ void dmxCallback(int universe, char buffer[512]){
   }
   // send out the Art-Net DMX data
   artnet.write();
+  Serial.write("Sent DMX data.\n");
 }
 
 // Initialise DMX
@@ -53,14 +54,23 @@ void setup()
       delay(500);
   }
 
+  Serial.write("WiFi connected.\n");
+
   // Connect to Artnet host
   artnet.begin(host);
   artnet.setLength(num_channels);
   artnet.setUniverse(universe);
+  Serial.write("ArtNet initialized.\n");
 }
 
 void loop()
 {
-  dmxUsb.listen();
+  char black[] = {0,0,0};
+  char white[] = {255,255,255};
+  //dmxUsb.listen();
+  dmxCallback(1, white);
+  delay(1000);
+  dmxCallback(1, black);
+  delay(1000);
 }
 
