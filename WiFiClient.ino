@@ -9,6 +9,7 @@
 #include <WiFi.h>
 #include <ArtnetWifi.h>
 #include <DMXUSB.h>
+#include <Wire.h>
 
 // Wifi settings
 const char* ssid     = "my_wifi_ssid";
@@ -25,8 +26,18 @@ const int num_fixtures = 1;
 const int num_channels = num_fixtures * num_channels_per_fixture;
 const int baud_rate = 115200;
 
+// I2C settings
+const int slave_address = 1;
+
+void i2cCallback(int num_bytes){
+  char buffer[512];
+  Wire.readBytes(buffer, num_bytes);
+  dmxCallback(0, buffer);
+}
+
 // Callback on incoming DMX packet
 void dmxCallback(int universe, char buffer[512]){
+  Serial.write("Received DMX data.\n");
   // Get value for each channel
   for (int i = 0 ; i < num_channels; i++) {
     // channels start at 1
@@ -36,14 +47,16 @@ void dmxCallback(int universe, char buffer[512]){
   }
   // send out the Art-Net DMX data
   artnet.write();
-  Serial.write("Sent DMX data.\n");
+  Serial.write("Sent ArtNet data.\n");
 }
 
 // Initialise DMX
-DMXUSB dmxUsb(Serial, baud_rate, 0, dmxCallback);
+DMXUSB dmxUsb(Wire, baud_rate, 0, dmxCallback);
 
 void setup()
 {
+  Wire.begin(SDA, SCL, baud_rate);
+  Wire.onReceive(i2cCallback);
   Serial.begin(baud_rate);
   delay(10);
 
@@ -65,12 +78,5 @@ void setup()
 
 void loop()
 {
-  char black[] = {0,0,0};
-  char white[] = {255,255,255};
-  //dmxUsb.listen();
-  dmxCallback(1, white);
-  delay(1000);
-  dmxCallback(1, black);
-  delay(1000);
 }
 
