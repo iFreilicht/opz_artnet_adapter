@@ -8,6 +8,7 @@
 
 #include <WiFi.h>
 #include <ArtnetWifi.h>
+#include <DMXUSB.h>
 
 // Wifi settings
 const char* ssid     = "my_wifi_ssid";
@@ -18,51 +19,48 @@ ArtnetWifi artnet;
 const int universe = 1;
 const char* host = "0.0.0.0";
 
+// DMX settings
+const int num_channels_per_fixture = 3;
+const int num_fixtures = 16;
+const int num_channels = num_fixtures * num_channels_per_fixture;
+const int baud_rate = 115200;
+
+// Callback on incoming DMX packet
+void dmxCallback(int universe, char buffer[512]){
+  // Get value for each channel
+  for (int i = 0 ; i < num_channels; i++) {
+    // channels start at 1
+    int channel = i + 1;
+    int value = buffer[i];
+    artnet.setByte(channel, value);
+  }
+  // send out the Art-Net DMX data
+  artnet.write();
+}
+
+// Initialise DMX
+DMXUSB dmxUsb(Serial, baud_rate, 0, dmxCallback);
+
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(baud_rate);
   delay(10);
 
-  // We start by connecting to a WiFi network
-
-  Serial.println();
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-
+  // Connect to WiFi network
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
       delay(500);
-      Serial.print(".");
   }
 
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-
+  // Connect to Artnet host
   artnet.begin(host);
-  artnet.setLength(3);
+  artnet.setLength(num_channels);
   artnet.setUniverse(universe);
 }
 
-int value = 0;
-
 void loop()
 {
-  uint8_t i;
-  uint8_t j;
-
-  // set the first 3 byte to all the same value. A RGB lamp will show a ramp-up white.
-  for (j = 0; j < 255; j++) {
-    for (i = 0; i < 3; i++) {
-      artnet.setByte(i, j);
-    }
-    // send out the Art-Net DMX data
-    artnet.write();
-    Serial.println(j);
-    delay(100);
-  }
+  dmxUsb.listen();
 }
 
