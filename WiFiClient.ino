@@ -6,12 +6,12 @@
  *
  */
 
-#include <WiFi.h>
+#include <ESP8266WiFi.h>
 #include <ArtnetWifi.h>
 #include <DMXUSB.h>
 
 // Wifi settings
-const char* ssid     = "my_wifi_ssid";
+char ssid[]     = "my_wifi_ssid";
 const char* password = "my_wifi_password";
 
 // Artnet settings
@@ -42,33 +42,35 @@ void dmxCallback(int universe, char buffer[512]){
 }
 
 // Initialise DMX
-DMXUSB dmxUsb(Serial2, baud_rate, 1, dmxCallback);
+DMXUSB dmxUsb(Serial, baud_rate, 0, dmxCallback);
 
 void setup()
 {
-  Serial2.begin(baud_rate);
   Serial.begin(baud_rate);
   delay(10);
 
   // Connect to WiFi network
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
       delay(500);
   }
 
-  Serial.write("WiFi connected.\n");
-
   // Connect to Artnet host
   artnet.begin(host);
   artnet.setLength(num_channels);
   artnet.setUniverse(universe);
-  Serial.write("ArtNet initialized.\n");
 }
 
 void loop()
 {
   dmxUsb.listen();
-  delay(40);
+  // Let WiFi modem sleep to reduce power consumption
+  // This is necessary, otherwise the OP-Z will refuse to provide power
+  WiFi.forceSleepBegin();
+  delay(20);
+  WiFi.forceSleepWake();
+  delay(20);
 }
 
