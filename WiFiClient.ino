@@ -66,11 +66,8 @@ void setup()
 void loop()
 {
   dmxUsb.listen();
-  // Let WiFi modem sleep to reduce power consumption
+  // Sleep to reduce power consumption
   // This is necessary, otherwise the OP-Z will refuse to provide power
-  WiFi.forceSleepBegin();
-  delay(20);
-  WiFi.forceSleepWake();
-  delay(20);
+  delay(40);
 }
 
