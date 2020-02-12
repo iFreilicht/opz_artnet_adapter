@@ -9,20 +9,11 @@
 #include <ArtnetWifi.h>
 #include <DMXUSB.h>
 
-// Wifi settings
-char ssid[]     = "my_wifi_ssid";
-const char* password = "my_wifi_password";
+// Modify the settings headers to fit your setup
+#include "artnet_settings.h"
+#include "dmx/16_led_strip/settings.h"
 
-// Artnet settings
 ArtnetWifi artnet;
-const int universe = 1;
-const char* host = "0.0.0.0";
-
-// DMX settings
-const int num_channels_per_fixture = 3;
-const int num_fixtures = 16;
-const int num_channels = num_fixtures * num_channels_per_fixture;
-const int baud_rate = 115200;
 
 // Callback on incoming DMX packet
 void dmxCallback(int universe, char buffer[512]){
