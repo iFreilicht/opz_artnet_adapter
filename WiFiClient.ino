@@ -1,9 +1,8 @@
 /*
- *  This sketch sends data via HTTP GET requests to data.sparkfun.com service.
+ *  Adapter of OP-Z to Artnet via WiFi.
  *
- *  You need to get streamId and privateKey at data.sparkfun.com and paste them
- *  below. Or just customize this script to talk to other HTTP servers.
- *
+ *  This has to be run on an ESP8266 (I recommend the ESP-01 module)
+ *  with an FTDI232 as the USB-to-serial converter.
  */
 
 #include <ESP8266WiFi.h>
@@ -25,14 +24,10 @@ const int num_fixtures = 16;
 const int num_channels = num_fixtures * num_channels_per_fixture;
 const int baud_rate = 115200;
 
-// I2C settings
-const int slave_address = 1;
-
 // Callback on incoming DMX packet
 void dmxCallback(int universe, char buffer[512]){
   // Get value for each channel
   for (int i = 0 ; i < num_channels; i++) {
-    // channels start at 1
     int channel = i;
     int value = buffer[i];
     artnet.setByte(channel, value);
