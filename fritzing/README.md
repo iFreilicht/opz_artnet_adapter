@@ -6,6 +6,7 @@ adapter on a breadboard.
 You may have to import `ESP8266-01.fzpz` into your parts library, it is
 not part of any default library.
 
-
+![Breaboard](Breadboard.png)
+![Schematic](Schematic.png)
 
 
