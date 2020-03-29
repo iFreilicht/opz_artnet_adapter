@@ -5,9 +5,9 @@
  *  with an FTDI232 as the USB-to-serial converter.
  */
 
-#include <ESP8266WiFi.h>
 #include <ArtnetWifi.h>
 #include <DMXUSB.h>
+#include <ESP8266WiFi.h>
 
 // Modify the settings headers to fit your setup
 #include "artnet_settings.h"
@@ -16,9 +16,9 @@
 ArtnetWifi artnet;
 
 // Callback on incoming DMX packet
-void dmxCallback(int universe, char buffer[512]){
+void dmxCallback(int universe, char buffer[512]) {
   // Get value for each channel
-  for (int i = 0 ; i < num_channels; i++) {
+  for (int i = 0; i < num_channels; i++) {
     int channel = i;
     int value = buffer[i];
     artnet.setByte(channel, value);
@@ -30,8 +30,7 @@ void dmxCallback(int universe, char buffer[512]){
 // Initialise DMX
 DMXUSB dmxUsb(Serial, baud_rate, 0, dmxCallback);
 
-void setup()
-{
+void setup() {
   Serial.begin(baud_rate);
   delay(10);
 
@@ -40,7 +39,7 @@ void setup()
   WiFi.begin(ssid, password);
 
   while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
+    delay(500);
   }
 
   // Connect to Artnet host
@@ -49,11 +48,9 @@ void setup()
   artnet.setUniverse(universe);
 }
 
-void loop()
-{
+void loop() {
   dmxUsb.listen();
   // Sleep to reduce power consumption
   // This is necessary, otherwise the OP-Z will refuse to provide power
   delay(40);
 }
-
