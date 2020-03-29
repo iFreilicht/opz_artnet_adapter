@@ -35,6 +35,7 @@ void setup() {
   delay(10);
 
   // Connect to WiFi network
+  WiFi.hostname("OP-Z Artnet");
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
